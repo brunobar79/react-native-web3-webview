@@ -83,7 +83,7 @@ import okhttp3.Response;
 import okhttp3.OkHttpClient.Builder;
 import static okhttp3.internal.Util.UTF_8;
 
-import com.web3webview.Web3Webview.ProgressEvent;
+import com.web3webview.ProgressEvent;
 
 /**
  * Manages instances of {@link WebView}
@@ -424,7 +424,7 @@ public class Web3WebviewManager extends ReactWebViewManager {
         }
     }
 
-    public Web3WebviewManager(ReactApplicationContext context, com.web3webview.Web3Webview.Web3WebviewPackage pkg) {
+    public Web3WebviewManager(ReactApplicationContext context, com.web3webview.Web3WebviewPackage pkg) {
         this.reactNativeContext = context;
         this.pkg = pkg;
         Builder b = new Builder();
