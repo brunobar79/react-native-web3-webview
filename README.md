@@ -1,5 +1,8 @@
 
 # react-native-web3-webview
+A cross platform react native webview with some improvements that allow a javascript injection, which is specifically used by web3 mobile dapp browsers.
+
+The iOS version is based on [react-native-wkwebview-reborn](https://github.com/CRAlpha/react-native-wkwebview) and the Android version is based on [react-native-webview-bridge](https://github.com/alinz/react-native-webview-bridge)
 
 ## Getting started
 
@@ -37,9 +40,24 @@
 
 ## Usage
 ```javascript
-import RNWeb3Webview from 'react-native-web3-webview';
+import Web3Webview from 'react-native-web3-webview';
 
-// TODO: What to do with the module?
-RNWeb3Webview;
+...
+
+render(){
+  return (
+    <Web3Webview
+        injectedOnStartLoadingJavaScript={ jsStringToInject }
+        onProgress={this.onLoadProgress}
+        onMessage={this.onMessage}
+        onNavigationStateChange={this.onPageChange}
+        ref={this.webview}
+        source={{ uri: url }}
+        style={baseStyles.flexGrow}
+     />
+  );  
+}
+
+
 ```
   
