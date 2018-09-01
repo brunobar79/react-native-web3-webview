@@ -20,6 +20,10 @@
     "name": "Bruno Barbieri",
     "email": "brunobar79@gmail.com"
   },
+  "homepage": "https://github.com/brunobar79/react-native-web3-webview",
+  "bugs": {
+    "url": "https://github.com/brunobar79/react-native-web3-webview/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "fbjs": "^0.8.3"
