@@ -227,8 +227,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
             super.onReceivedError(webView, errorCode, description, failingUrl);
             mLastLoadFailed = true;
 
-            // In case of an error JS side expect to get a finish event first, and then get an error event
-            // Android WebView does it in the opposite way, so we need to simulate that behavior
             emitFinishEvent(webView, failingUrl);
 
             WritableMap eventData = createWebViewEvent(webView, failingUrl);
@@ -261,8 +259,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
         protected WritableMap createWebViewEvent(WebView webView, String url) {
             WritableMap event = Arguments.createMap();
             event.putDouble("target", webView.getId());
-            // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
-            // like onPageFinished
             event.putString("url", url);
             event.putBoolean("loading", !mLastLoadFailed && webView.getProgress() != 100);
             event.putString("title", webView.getTitle());
@@ -282,12 +278,12 @@ public class Web3WebviewManager extends ReactWebViewManager {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 response = Web3WebviewManager.this.shouldInterceptRequest(request, true, (Web3Webview) view);
                 if (response != null) {
-                    Log.d("Web3Webview", "shouldInterceptRequest / WebViewClient -> return intercept response");
+                    Log.d("Web3Webview", "shouldInterceptRequest::WebViewClient => YES");
                     return response;
                 }
             }
 
-            Log.d("Web3Webview", "shouldInterceptRequest / WebViewClient -> intercept response is nil, delegating up");
+            Log.d("Web3Webview", "shouldInterceptRequest::WebViewClient => NO");
             return super.shouldInterceptRequest(view, request);
         }
 
@@ -466,13 +462,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
     public WebResourceResponse shouldInterceptRequest(WebResourceRequest request, Boolean onlyMainFrame, Web3Webview webView) {
         Uri url = request.getUrl();
         String urlStr = url.toString();
-        Log.d("Web3Webview","new request ");
-        Log.d("Web3Webview","url " + urlStr);
-        Log.d("Web3Webview","host " + request.getUrl().getHost());
-        Log.d("Web3Webview","path " + request.getUrl().getPath());
-        Log.d("Web3Webview","main " + request.isForMainFrame());
-        Log.d("Web3Webview","headers " + request.getRequestHeaders().toString());
-        Log.d("Web3Webview","method " + request.getMethod());
         if (onlyMainFrame && !request.isForMainFrame()) {
             return null;
         }
@@ -484,9 +473,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
                     .url(urlStr)
                     .build();
             Response response = httpClient.newCall(req).execute();
-            Log.d("Web3Webview", "response headers " + response.headers().toString());
-            Log.d("Web3Webview", "response code " + response.code());
-            Log.d("Web3Webview", "response ok? " + response.isSuccessful());
             if (!Web3WebviewManager.responseRequiresJSInjection(response)) {
                 return null;
             }
@@ -496,11 +482,8 @@ public class Web3WebviewManager extends ReactWebViewManager {
             if (response.code() == HttpURLConnection.HTTP_OK) {
                 is = new InputStreamWithInjectedJS(is, webView.injectedOnStartLoadingJS, charset, webView.getContext());
             }
-            Log.d("Web3Webview", "inject our custom JS to this request");
             return new WebResourceResponse("text/html", charset.name(), is);
         } catch (IOException e) {
-            Log.e("Web3Webview", "injection failed");
-            Log.e("Web3Webview", e.toString());
             return null;
         }
     }
@@ -533,9 +516,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
                 if(webView.getProgress() >= 10){
                     webView.linkBridge();
                 }
-
-                Log.d("Web3WebviewProgress", Integer.toString(webView.getProgress()));
-
             }
 
             @Override
@@ -613,7 +593,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
     @ReactProp(name = "userAgent")
     public void setUserAgent(WebView view, @Nullable String userAgent) {
         if (userAgent != null) {
-            // TODO(8496850): Fix incorrect behavior when property is unset (uA == null)
             view.getSettings().setUserAgentString(userAgent);
         }
     }
@@ -666,9 +645,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
             if (source.hasKey("uri")) {
                 String url = source.getString("uri");
                 String previousUrl = view.getUrl();
-                //if (previousUrl != null && previousUrl.equals(url)) {
-                //    return;
-                //}
                 if (source.hasKey("method")) {
                     String method = source.getString("method");
                     if (method.equals(HTTP_METHOD_POST)) {
@@ -704,7 +680,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
                     }
                 }
                 view.loadUrl(url, headerMap);
-                Log.d("Web3WebviewLoadUrl", "loading url: "+url);
                 return;
             }
         }
@@ -766,7 +741,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
 
     @Override
     protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
-        // Do not register default touch emitter and let WebView implementation handle touches
         view.setWebViewClient(new Web3WebviewClient());
     }
 
