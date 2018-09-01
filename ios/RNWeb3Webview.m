@@ -501,11 +501,23 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 
   if (isJSNavigation) {
-    decisionHandler(WKNavigationActionPolicyCancel);
-  }
-  else {
+
+  	decisionHandler(WKNavigationActionPolicyCancel);
+
+  } else if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
+
+  	decisionHandler(WKNavigationActionPolicyAllow);
+
+  } else {
+
+  	if (![scheme isEqualToString:@"about"]) {
+    	[[UIApplication sharedApplication] openURL:url];
+    }
+
     decisionHandler(WKNavigationActionPolicyAllow);
+
   }
+
 }
 
 - (void)webView:(__unused WKWebView *)webView didFailProvisionalNavigation:(__unused WKNavigation *)navigation withError:(NSError *)error
