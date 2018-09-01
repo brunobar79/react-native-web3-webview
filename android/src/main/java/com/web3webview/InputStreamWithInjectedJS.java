@@ -1,5 +1,5 @@
 
-package com.web3webview.Web3Webview;
+package com.web3webview;
 
 import android.content.Context;
 import android.os.Build;
