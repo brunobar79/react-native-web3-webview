@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package com.web3webview.Web3Webview;
+package com.web3webview;
 
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
