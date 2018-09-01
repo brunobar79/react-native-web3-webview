@@ -1,0 +1,32 @@
+{
+  "name": "react-native-web3-webview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "native",
+    "wkwebview",
+    "webview",
+    "ios",
+    "android",
+    "web3",
+    "ethereum"
+  ],
+  "author": {
+    "name": "Bruno Barbieri",
+    "email": "brunobar79@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "fbjs": "^0.8.3"
+  },
+  "peerDependencies": {
+    "prop-types": "^15.6.0",
+    "react": "^16.0.0",
+    "react-native": "^0.56.0"
+  }
+}

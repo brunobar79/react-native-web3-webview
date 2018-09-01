@@ -1,0 +1,27 @@
+package com.metamask.Web3Webview;
+
+import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.uimanager.ViewManager;
+
+import java.util.Collections;
+import java.util.List;
+
+public class Web3WebviewPackage implements ReactPackage {
+
+    @Override
+    public List<ViewManager> createViewManagers(
+            ReactApplicationContext reactContext) {
+        return Collections.<ViewManager>singletonList(
+                new Web3WebviewManager(reactContext,this)
+        );
+    }
+
+    @Override
+    public List<NativeModule> createNativeModules(
+            ReactApplicationContext reactContext) {
+        return Collections.emptyList();
+    }
+
+}
