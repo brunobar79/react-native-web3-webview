@@ -1,4 +1,4 @@
-package com.web3webview.Web3Webview;
+package com.web3webview;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
