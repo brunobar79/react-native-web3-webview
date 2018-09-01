@@ -2,10 +2,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import deprecatedPropType from 'deprecatedPropType'; // eslint-disable-line import/no-unresolved
-import keyMirror from 'fbjs/lib/keyMirror'; // eslint-disable-line import/no-extraneous-dependencies
-import resolveAssetSource from 'resolveAssetSource'; // eslint-disable-line import/no-unresolved
-import WebViewShared from 'WebViewShared'; // eslint-disable-line import/no-unresolved
+import keyMirror from 'fbjs/lib/keyMirror';
+import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
+import WebViewShared from 'react-native/Libraries/Components/WebView/WebViewShared';
 
 import {
 	requireNativeComponent,
@@ -71,10 +70,6 @@ export default class WebView extends React.Component {
 		onContentSizeChange: PropTypes.func,
 		startInLoadingState: PropTypes.bool, // force WebView to show loadingView on first load
 		style: ViewPropTypes.style,
-
-		html: deprecatedPropType(PropTypes.string, 'Use the `source` prop instead.'),
-
-		url: deprecatedPropType(PropTypes.string, 'Use the `source` prop instead.'),
 
 		/**
 		 * Loads static html or a uri (with optional headers) in the WebView.
