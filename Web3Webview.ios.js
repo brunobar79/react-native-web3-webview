@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 import ReactNative, {
   requireNativeComponent,
   EdgeInsetsPropType,
@@ -12,56 +12,57 @@ import ReactNative, {
   NativeModules,
   Text,
   ActivityIndicator
-} from 'react-native';
+} from "react-native";
 
-import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
-import deprecatedPropType from 'react-native/Libraries/Utilities/deprecatedPropType';
-import invariant from 'fbjs/lib/invariant';
-import keyMirror from 'fbjs/lib/keyMirror';
+import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import deprecatedPropType from "react-native/Libraries/Utilities/deprecatedPropType";
+import invariant from "fbjs/lib/invariant";
+import keyMirror from "fbjs/lib/keyMirror";
+import WebViewShared from "react-native/Libraries/Components/WebView/WebViewShared";
 const RNWeb3WebviewManager = NativeModules.RNWeb3WebviewManager;
 
-let BGWASH = 'rgba(255,255,255,0.8)';
+let BGWASH = "rgba(255,255,255,0.8)";
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	errorContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: BGWASH,
-	},
-	errorText: {
-		fontSize: 14,
-		textAlign: 'center',
-		marginBottom: 2,
-	},
-	errorTextTitle: {
-		fontSize: 15,
-		fontWeight: '500',
-		marginBottom: 10,
-	},
-	hidden: {
-		height: 0,
-		flex: 0, // disable 'flex:1' when hiding a View
-	},
-	loadingView: {
-		backgroundColor: BGWASH,
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		height: 100,
-	},
-	webView: {
-		backgroundColor: '#ffffff', // eslint-disable-line
-	}
-  });
+  container: {
+    flex: 1
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: BGWASH
+  },
+  errorText: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 2
+  },
+  errorTextTitle: {
+    fontSize: 15,
+    fontWeight: "500",
+    marginBottom: 10
+  },
+  hidden: {
+    height: 0,
+    flex: 0 // disable 'flex:1' when hiding a View
+  },
+  loadingView: {
+    backgroundColor: BGWASH,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 100
+  },
+  webView: {
+    backgroundColor: "#ffffff" // eslint-disable-line
+  }
+});
 
 const WebViewState = keyMirror({
   IDLE: null,
   LOADING: null,
-  ERROR: null,
+  ERROR: null
 });
 
 const NavigationType = keyMirror({
@@ -70,38 +71,33 @@ const NavigationType = keyMirror({
   backforward: true,
   reload: true,
   formresubmit: true,
-  other: true,
+  other: true
 });
 
-const JSNavigationScheme = 'react-js-navigation';
+const JSNavigationScheme = "react-js-navigation";
 
 type ErrorEvent = {
-  domain: any;
-  code: any;
-  description: any;
-}
+  domain: any,
+  code: any,
+  description: any
+};
 
 type Event = Object;
 
-const defaultRenderLoading = () => (
-  <View style={styles.loadingView}>
-    <ActivityIndicator />
-  </View>
-);
+const defaultRenderLoading = show =>
+  show
+    ? ((
+        <View style={styles.loadingView}>
+          <ActivityIndicator />
+        </View>
+      ): null)
+    : null;
 const defaultRenderError = (errorDomain, errorCode, errorDesc) => (
   <View style={styles.errorContainer}>
-    <Text style={styles.errorTextTitle}>
-      Error loading page
-    </Text>
-    <Text style={styles.errorText}>
-      {'Domain: ' + errorDomain}
-    </Text>
-    <Text style={styles.errorText}>
-      {'Error Code: ' + errorCode}
-    </Text>
-    <Text style={styles.errorText}>
-      {'Description: ' + errorDesc}
-    </Text>
+    <Text style={styles.errorTextTitle}>Error loading page</Text>
+    <Text style={styles.errorText}>{"Domain: " + errorDomain}</Text>
+    <Text style={styles.errorText}>{"Error Code: " + errorCode}</Text>
+    <Text style={styles.errorText}>{"Description: " + errorDesc}</Text>
   </View>
 );
 
@@ -118,13 +114,10 @@ class Web3Webview extends React.Component {
 
     html: deprecatedPropType(
       PropTypes.string,
-      'Use the `source` prop instead.'
+      "Use the `source` prop instead."
     ),
 
-    url: deprecatedPropType(
-      PropTypes.string,
-      'Use the `source` prop instead.'
-    ),
+    url: deprecatedPropType(PropTypes.string, "Use the `source` prop instead."),
 
     /**
      * Loads static html or a uri (with optional headers) in the WebView.
@@ -151,7 +144,7 @@ class Web3Webview extends React.Component {
          * additional encoding (e.g. URL-escaping or base64) applied.
          * NOTE: On Android, this can only be used with POST requests.
          */
-        body: PropTypes.string,
+        body: PropTypes.string
       }),
       PropTypes.shape({
         /*
@@ -161,12 +154,12 @@ class Web3Webview extends React.Component {
         /*
          * The base URL to be used for any relative links in the HTML.
          */
-        baseUrl: PropTypes.string,
+        baseUrl: PropTypes.string
       }),
       /*
        * Used internally by packager.
        */
-      PropTypes.number,
+      PropTypes.number
     ]),
 
     /**
@@ -175,10 +168,10 @@ class Web3Webview extends React.Component {
      * "never". Available on iOS 11 and later.
      */
     contentInsetAdjustmentBehavior: PropTypes.oneOf([
-      'automatic',
-      'scrollableAxes',
-      'never', // default
-      'always',
+      "automatic",
+      "scrollableAxes",
+      "never", // default
+      "always"
     ]),
 
     /**
@@ -284,23 +277,38 @@ class Web3Webview extends React.Component {
     allowsLinkPreview: PropTypes.bool,
     /**
      * Sets the customized user agent by using of the RNWeb3Webview
-    */
+     */
     customUserAgent: PropTypes.string,
     userAgent: PropTypes.string,
     /**
      * A Boolean value that determines whether paging is enabled for the scroll view.
-    */
+     */
     pagingEnabled: PropTypes.bool,
     /**
      * A Boolean value that sets whether diagonal scrolling is allowed.
-    */
+     */
     directionalLockEnabled: PropTypes.bool,
+    /**
+     * Show the default loader view
+     */
+    showDefaultLoader: PropTypes.bool
   };
 
   state = {
     viewState: WebViewState.IDLE,
     lastErrorEvent: (null: ?ErrorEvent),
-    startInLoadingState: true,
+    startInLoadingState: true
+  };
+
+  static defaultProps = {
+    javaScriptEnabled: true,
+    messagingEnabled: true,
+    thirdPartyCookiesEnabled: true,
+    scalesPageToFit: true,
+    saveFormDataDisabled: false,
+    originWhitelist: WebViewShared.defaultOriginWhitelist,
+    showDefaultLoader: false,
+    openNewWindowInWebView: true
   };
 
   UNSAFE_componentWillMount() {
@@ -313,13 +321,12 @@ class Web3Webview extends React.Component {
     let otherView = null;
 
     if (this.state.viewState === WebViewState.LOADING) {
-      otherView = (this.props.renderLoading || defaultRenderLoading)();
+      otherView = this.props.renderLoading
+        ? this.props.renderLoading()
+        : defaultRenderLoading(this.props.showDefaultLoader);
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
-      invariant(
-        errorEvent != null,
-        'lastErrorEvent expected to be non-null'
-      );
+      invariant(errorEvent != null, "lastErrorEvent expected to be non-null");
       otherView = (this.props.renderError || defaultRenderError)(
         errorEvent.domain,
         errorEvent.code,
@@ -327,25 +334,33 @@ class Web3Webview extends React.Component {
       );
     } else if (this.state.viewState !== WebViewState.IDLE) {
       console.error(
-        'RNWeb3Webview invalid state encountered: ' + this.state.loading
+        "RNWeb3Webview invalid state encountered: " + this.state.loading
       );
     }
 
     const webViewStyles = [styles.container, styles.webView, this.props.style];
-    if (this.state.viewState === WebViewState.LOADING ||
-      this.state.viewState === WebViewState.ERROR) {
+    if (
+      this.state.viewState === WebViewState.LOADING ||
+      this.state.viewState === WebViewState.ERROR
+    ) {
       // if we're in either LOADING or ERROR states, don't show the webView
       webViewStyles.push(styles.hidden);
     }
 
-    const onShouldStartLoadWithRequest = this.props.onShouldStartLoadWithRequest && ((event: Event) => {
-      const shouldStart = this.props.onShouldStartLoadWithRequest &&
-        this.props.onShouldStartLoadWithRequest(event.nativeEvent);
-      RNWeb3WebviewManager.startLoadWithResult(!!shouldStart, event.nativeEvent.lockIdentifier);
-    });
+    const onShouldStartLoadWithRequest =
+      this.props.onShouldStartLoadWithRequest &&
+      ((event: Event) => {
+        const shouldStart =
+          this.props.onShouldStartLoadWithRequest &&
+          this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+        RNWeb3WebviewManager.startLoadWithResult(
+          !!shouldStart,
+          event.nativeEvent.lockIdentifier
+        );
+      });
 
     let source = this.props.source || {};
-    if (typeof source == 'object') {
+    if (typeof source == "object") {
       source.sendCookies = this.props.sendCookies;
       source.customUserAgent =
         this.props.customUserAgent || this.props.userAgent;
@@ -357,27 +372,41 @@ class Web3Webview extends React.Component {
       source.uri = this.props.url;
     }
 
-    const messagingEnabled = typeof this.props.onMessage === 'function';
+    const messagingEnabled = typeof this.props.onMessage === "function";
 
     const webView = (
       <RNWeb3Webview
-        ref={ref => { this.webview = ref; }}
+        ref={ref => {
+          this.webview = ref;
+        }}
         key="webViewKey"
         style={webViewStyles}
-        contentInsetAdjustmentBehavior={this.props.contentInsetAdjustmentBehavior}
+        contentInsetAdjustmentBehavior={
+          this.props.contentInsetAdjustmentBehavior
+        }
         source={resolveAssetSource(source)}
-        injectJavaScriptForMainFrameOnly={this.props.injectJavaScriptForMainFrameOnly}
-        injectedJavaScriptForMainFrameOnly={this.props.injectedJavaScriptForMainFrameOnly}
+        injectJavaScriptForMainFrameOnly={
+          this.props.injectJavaScriptForMainFrameOnly
+        }
+        injectedJavaScriptForMainFrameOnly={
+          this.props.injectedJavaScriptForMainFrameOnly
+        }
         injectJavaScript={this.props.injectJavaScript}
         injectedJavaScript={this.props.injectedJavaScript}
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
         contentInset={this.props.contentInset}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
-        automaticallyAdjustContentInsets={this.props.automaticallyAdjustContentInsets}
+        allowsBackForwardNavigationGestures={
+          this.props.allowsBackForwardNavigationGestures
+        }
+        automaticallyAdjustContentInsets={
+          this.props.automaticallyAdjustContentInsets
+        }
         openNewWindowInWebView={this.props.openNewWindowInWebView}
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        keyboardDisplayRequiresUserAction={this.props.keyboardDisplayRequiresUserAction}
+        keyboardDisplayRequiresUserAction={
+          this.props.keyboardDisplayRequiresUserAction
+        }
         allowsLinkPreview={this.props.allowsLinkPreview}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
@@ -389,7 +418,8 @@ class Web3Webview extends React.Component {
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         pagingEnabled={this.props.pagingEnabled}
         directionalLockEnabled={this.props.directionalLockEnabled}
-	/>);
+      />
+    );
 
     return (
       <View style={styles.container}>
@@ -455,7 +485,7 @@ class Web3Webview extends React.Component {
       this.getWebViewHandle(),
       UIManager.RNWeb3Webview.Commands.stopLoading,
       null
-    )
+    );
   };
 
   /**
@@ -468,7 +498,7 @@ class Web3Webview extends React.Component {
    * document.addEventListener('message', e => { document.title = e.data; });
    * ```
    */
-  postMessage = (data) => {
+  postMessage = data => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.RNWeb3Webview.Commands.postMessage,
@@ -476,7 +506,7 @@ class Web3Webview extends React.Component {
     );
   };
 
-  evaluateJavaScript = (js) => {
+  evaluateJavaScript = js => {
     return RNWeb3WebviewManager.evaluateJavaScript(this.getWebViewHandle(), js);
   };
 
@@ -508,7 +538,7 @@ class Web3Webview extends React.Component {
     const { onError, onLoadEnd } = this.props;
     onError && onError(event);
     onLoadEnd && onLoadEnd(event);
-    console.warn('Encountered an error loading page', event.nativeEvent);
+    console.warn("Encountered an error loading page", event.nativeEvent);
 
     this.setState({
       lastErrorEvent: event.nativeEvent,
@@ -521,7 +551,7 @@ class Web3Webview extends React.Component {
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
     this.setState({
-      viewState: WebViewState.IDLE,
+      viewState: WebViewState.IDLE
     });
     this._updateNavigationState(event);
   };
@@ -542,16 +572,14 @@ class Web3Webview extends React.Component {
   };
 }
 
-const RNWeb3Webview = requireNativeComponent('RNWeb3Webview', RNWeb3Webview, {
+const RNWeb3Webview = requireNativeComponent("RNWeb3Webview", RNWeb3Webview, {
   nativeOnly: {
     onLoadingStart: true,
     onLoadingError: true,
     onLoadingFinish: true,
     onMessage: true,
-    messagingEnabled: PropTypes.bool,
+    messagingEnabled: PropTypes.bool
   }
 });
-
-
 
 export default Web3Webview;
