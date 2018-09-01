@@ -1,4 +1,4 @@
-package com.metamask.Web3Webview;
+package com.web3webview.Web3Webview;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
