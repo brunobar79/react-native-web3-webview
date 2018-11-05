@@ -52,6 +52,9 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.views.scroll.ScrollEvent;
+import com.facebook.react.views.scroll.ScrollEventType;
+import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.webview.ReactWebViewManager;
 import com.facebook.react.views.webview.WebViewConfig;
 import com.facebook.react.views.webview.events.TopLoadingErrorEvent;
@@ -306,6 +309,7 @@ public class Web3WebviewManager extends ReactWebViewManager {
         protected @Nullable String injectedOnStartLoadingJS;
         protected boolean messagingEnabled = false;
         protected @Nullable Web3WebviewClient mWeb3WebviewClient;
+        private final OnScrollDispatchHelper mOnScrollDispatchHelper = new OnScrollDispatchHelper();
 
         protected class Web3WebviewBridge {
             Web3Webview mContext;
@@ -416,6 +420,24 @@ public class Web3WebviewManager extends ReactWebViewManager {
 
         public void onMessage(String message) {
             dispatchEvent(this, new TopMessageEvent(this.getId(), message));
+        }
+
+        protected void onScrollChanged(int x, int y, int oldX, int oldY) {
+            super.onScrollChanged(x, y, oldX, oldY);
+            if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
+                ScrollEvent event = ScrollEvent.obtain(
+                this.getId(),
+                ScrollEventType.SCROLL,
+                x,
+                y,
+                mOnScrollDispatchHelper.getXFlingVelocity(),
+                mOnScrollDispatchHelper.getYFlingVelocity(),
+                this.computeHorizontalScrollRange(),
+                this.computeVerticalScrollRange(),
+                this.getWidth(),
+                this.getHeight());
+                dispatchEvent(this, event);
+            }
         }
 
         protected void cleanupCallbacksAndDestroy() {
