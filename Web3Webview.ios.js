@@ -220,6 +220,40 @@ class Web3Webview extends React.Component {
 		 */
 		onScroll: PropTypes.func,
 		/**
+		 * Called when the momentum scroll starts (scroll which occurs as the ScrollView glides to a stop).
+		 */
+		onMomentumScrollBegin: PropTypes.func,
+		/**
+		 * Called when the momentum scroll ends (scroll which occurs as the ScrollView glides to a stop).
+		 */
+		onMomentumScrollEnd: PropTypes.func,
+		/**
+		 * Called when the user begins to drag the scroll view.
+		 */
+		onScrollBeginDrag: PropTypes.func,
+		/**
+		 * Called when the user stops dragging the scroll view and it either stops
+		 * or begins to glide.
+		 */
+		onScrollEndDrag: PropTypes.func,
+		/**
+		 * Receive scroll events from view
+		 */
+		onScroll: PropTypes.func,
+		/**
+		 * This controls how often the scroll event will be fired while scrolling
+		 * (as a time interval in ms). A lower number yields better accuracy for code
+		 * that is tracking the scroll position, but can lead to scroll performance
+		 * problems due to the volume of information being send over the bridge.
+		 * You will not notice a difference between values set between 1-16 as the
+		 * JS run loop is synced to the screen refresh rate. If you do not need precise
+		 * scroll position tracking, set this value higher to limit the information
+		 * being sent across the bridge. The default value is zero, which results in
+		 * the scroll event being sent only once each time the view is scrolled.
+		 * @platform ios
+		 */
+		scrollEventThrottle: PropTypes.number,
+		/**
 		 * @platform ios
 		 */
 		bounces: PropTypes.bool,
@@ -433,6 +467,12 @@ class Web3Webview extends React.Component {
 				onProgress={this._onProgress}
 				onMessage={this._onMessage}
 				onScroll={this._onScroll}
+				onScrollToTop={this._onScrollToTop}
+				onScrollBeginDrag={this._onScrollBeginDrag}
+				scrollEventThrottle={this.props.scrollEventThrottle}
+				onScrollEndDrag={this._onScrollEndDrag}
+				onMomentumScrollBegin={this._onMomentumScrollBegin}
+				onMomentumScrollEnd={this._onMomentumScrollEnd}
 				onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
 				pagingEnabled={this.props.pagingEnabled}
 				directionalLockEnabled={this.props.directionalLockEnabled}
@@ -590,6 +630,31 @@ class Web3Webview extends React.Component {
 	_onScroll = (event: Event) => {
 		const onScroll = this.props.onScroll;
 		onScroll && onScroll(event.nativeEvent);
+	};
+
+	_onScrollToTop = (event: Event) => {
+		const onScrollToTop = this.props.onScrollToTop;
+		onScrollToTop && onScrollToTop(event.nativeEvent);
+	};
+
+	_onScrollBeginDrag = (event: Event) => {
+		const onScrollBeginDrag = this.props.onScrollBeginDrag;
+		onScrollBeginDrag && onScrollBeginDrag(event.nativeEvent);
+	};
+
+	_onScrollEndDrag = (event: Event) => {
+		const onScrollEndDrag = this.props.onScrollEndDrag;
+		onScrollEndDrag && onScrollEndDrag(event.nativeEvent);
+	};
+
+	_onMomentumScrollBegin = (event: Event) => {
+		const onMomentumScrollBegin = this.props.onMomentumScrollBegin;
+		onMomentumScrollBegin && onMomentumScrollBegin(event.nativeEvent);
+	};
+
+	_onMomentumScrollEnd = (event: Event) => {
+		const onMomentumScrollEnd = this.props.onMomentumScrollEnd;
+		onMomentumScrollEnd && onMomentumScrollEnd(event.nativeEvent);
 	};
 }
 

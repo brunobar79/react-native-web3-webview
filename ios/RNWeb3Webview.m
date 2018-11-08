@@ -32,10 +32,20 @@
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onProgress;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
+// NOTE: currently these event props are only declared so we can export the
+// event names to JS - we don't call the blocks directly because scroll events
+// need to be coalesced before sending, for performance reasons.
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
+@property (nonatomic, copy) RCTDirectEventBlock onScrollToTop;
+@property (nonatomic, copy) RCTDirectEventBlock onScrollBeginDrag;
+@property (nonatomic, copy) RCTDirectEventBlock onScrollEndDrag;
+@property (nonatomic, copy) RCTDirectEventBlock onMomentumScrollBegin;
+@property (nonatomic, copy) RCTDirectEventBlock onMomentumScrollEnd;
+
 @property (assign) BOOL sendCookies;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+@property (nonatomic, assign) NSTimeInterval scrollEventThrottle;
 
 @end
 
@@ -46,6 +56,8 @@
   BOOL _injectedJavaScriptForMainFrameOnly;
   NSString *_injectJavaScript;
   NSString *_injectedJavaScript;
+  BOOL _allowNextScrollNoMatterWhat;
+  NSTimeInterval _lastScrollDispatchTime;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -62,6 +74,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     super.backgroundColor = [UIColor clearColor];
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
+    _scrollEventThrottle = 0.0;
 
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.processPool = processPool;
@@ -416,34 +429,89 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   _webView.scrollView.delegate = nil;
 }
 
+- (NSDictionary *)getEventInfo: (UIScrollView *)scrollView {
+    return @{
+             @"contentOffset": @{
+                     @"x": @(scrollView.contentOffset.x),
+                     @"y": @(scrollView.contentOffset.y)
+                     },
+             @"contentInset": @{
+                     @"top": @(scrollView.contentInset.top),
+                     @"left": @(scrollView.contentInset.left),
+                     @"bottom": @(scrollView.contentInset.bottom),
+                     @"right": @(scrollView.contentInset.right)
+                     },
+             @"contentSize": @{
+                     @"width": @(scrollView.contentSize.width),
+                     @"height": @(scrollView.contentSize.height)
+                     },
+             @"layoutMeasurement": @{
+                     @"width": @(scrollView.frame.size.width),
+                     @"height": @(scrollView.frame.size.height)
+                     },
+             @"zoomScale": @(scrollView.zoomScale ?: 1),
+             };
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  if (!scrollView.scrollEnabled) {
-    scrollView.bounds = _webView.bounds;
-    return;
-  }
-  NSDictionary *event = @{
-                        @"contentOffset": @{
-                            @"x": @(scrollView.contentOffset.x),
-                            @"y": @(scrollView.contentOffset.y)
-                            },
-                        @"contentInset": @{
-                            @"top": @(scrollView.contentInset.top),
-                            @"left": @(scrollView.contentInset.left),
-                            @"bottom": @(scrollView.contentInset.bottom),
-                            @"right": @(scrollView.contentInset.right)
-                            },
-                        @"contentSize": @{
-                            @"width": @(scrollView.contentSize.width),
-                            @"height": @(scrollView.contentSize.height)
-                            },
-                        @"layoutMeasurement": @{
-                            @"width": @(scrollView.frame.size.width),
-                            @"height": @(scrollView.frame.size.height)
-                            },
-                        @"zoomScale": @(scrollView.zoomScale ?: 1),
-                        };
-  _onScroll(event);
+  
+    [self updateClippedSubviews];
+    
+    if (!scrollView.scrollEnabled) {
+        scrollView.bounds = _webView.bounds;
+        return;
+    }
+    
+    NSTimeInterval now = CACurrentMediaTime();
+    
+    if (_allowNextScrollNoMatterWhat ||
+        (_scrollEventThrottle > 0 && _scrollEventThrottle < (now - _lastScrollDispatchTime))) {
+        
+        _onScroll([self getEventInfo:scrollView]);
+        // Update dispatch time
+        _lastScrollDispatchTime = now;
+        _allowNextScrollNoMatterWhat = NO;
+    }
+  
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    _onScrollBeginDrag([self getEventInfo:scrollView]);
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView
+{
+    _onScrollEndDrag([self getEventInfo:scrollView]);
+}
+
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
+{
+    
+    // Fire the being deceleration event
+    _onMomentumScrollBegin([self getEventInfo:scrollView]);
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+     [self scrollViewDidScroll:scrollView];
+    
+    // Fire the end deceleration event
+    _onMomentumScrollEnd([self getEventInfo:scrollView]);
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    [self scrollViewDidScroll:scrollView];
+    
+    // Fire the end deceleration event
+    _onMomentumScrollEnd([self getEventInfo:scrollView]);
+}
+
+- (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView
+{
+    _onScrollToTop([self getEventInfo:scrollView]);
 }
 
 #pragma mark - WKNavigationDelegate methods
