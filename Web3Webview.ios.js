@@ -410,9 +410,13 @@ class Web3Webview extends React.Component {
 
 		let source = this.props.source || {};
 		if (typeof source == "object") {
-			source.sendCookies = this.props.sendCookies;
-			source.customUserAgent =
+			if(this.props.sendCookies){
+				source.sendCookies = this.props.sendCookies;
+			}
+			if(this.props.customUserAgent || this.props.userAgent){
+				source.customUserAgent =
 				this.props.customUserAgent || this.props.userAgent;
+			}
 		}
 
 		if (this.props.html) {
