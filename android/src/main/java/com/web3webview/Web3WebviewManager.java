@@ -18,6 +18,8 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
@@ -45,16 +47,15 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.module.annotations.ReactModule;
-import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
-import com.facebook.react.views.scroll.OnScrollDispatchHelper;
 import com.facebook.react.views.webview.ReactWebViewManager;
 import com.facebook.react.views.webview.WebViewConfig;
 import com.facebook.react.views.webview.events.TopLoadingErrorEvent;
@@ -81,12 +82,11 @@ import javax.annotation.Nullable;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.OkHttpClient.Builder;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.OkHttpClient.Builder;
-import static okhttp3.internal.Util.UTF_8;
 
-import com.web3webview.ProgressEvent;
+import static okhttp3.internal.Util.UTF_8;
 
 /**
  * Manages instances of {@link WebView}
@@ -157,10 +157,15 @@ public class Web3WebviewManager extends ReactWebViewManager {
             if (!mLastLoadFailed) {
                 Web3Webview Web3Webview = (Web3Webview) webView;
                 Web3Webview.callInjectedJavaScript();
+                Web3Webview.setVerticalScrollBarEnabled(true);
+                Web3Webview.setHorizontalScrollBarEnabled(true);
+                webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 emitFinishEvent(webView, url);
                 Web3Webview.linkBridge();
             }
         }
+
+
 
         @Override
         public void onPageStarted(final WebView webView, String url, Bitmap favicon) {
@@ -351,6 +356,23 @@ public class Web3WebviewManager extends ReactWebViewManager {
         }
 
         @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_BACK:
+                        if (this.canGoBack()) {
+                            this.goBack();
+                            return true;
+                        }
+
+                }
+
+            }
+            return super.onKeyDown(keyCode, event);
+        }
+
+        @Override
         public void setWebViewClient(WebViewClient client) {
             super.setWebViewClient(client);
             mWeb3WebviewClient = (Web3WebviewClient)client;
@@ -421,6 +443,8 @@ public class Web3WebviewManager extends ReactWebViewManager {
         public void onMessage(String message) {
             dispatchEvent(this, new TopMessageEvent(this.getId(), message));
         }
+
+
 
         protected void onScrollChanged(int x, int y, int oldX, int oldY) {
             super.onScrollChanged(x, y, oldX, oldY);
@@ -857,4 +881,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
                                 MapBuilder.of("bubbled", "onProgress")))
                 .build();
     }
+
+
 }
