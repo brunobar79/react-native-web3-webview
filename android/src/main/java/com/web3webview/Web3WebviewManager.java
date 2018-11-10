@@ -820,7 +820,6 @@ public class Web3WebviewManager extends ReactWebViewManager {
 
     @Override
     public void onDropViewInstance(WebView webView) {
-        super.onDropViewInstance(webView);
         ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((Web3Webview) webView);
         ((Web3Webview) webView).cleanupCallbacksAndDestroy();
     }
