@@ -75,11 +75,14 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
     _scrollEventThrottle = 0.0;
-
+     
+      
+      
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.processPool = processPool;
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:@"reactNative"];
+      
     config.userContentController = userController;
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
@@ -495,7 +498,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-     [self scrollViewDidScroll:scrollView];
+    [self scrollViewDidScroll:scrollView];
     
     // Fire the end deceleration event
     _onMomentumScrollEnd([self getEventInfo:scrollView]);

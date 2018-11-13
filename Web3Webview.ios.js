@@ -408,7 +408,7 @@ class Web3Webview extends React.Component {
 				);
 			});
 
-		let source = this.props.source || {};
+		let source = {...this.props.source} || {};
 		if (typeof source == "object") {
 			if(this.props.sendCookies){
 				source.sendCookies = this.props.sendCookies;

@@ -480,6 +480,6 @@ export default class WebView extends React.Component {
 
 	onScroll = event => {
 		const {onScroll} = this.props;
-		onScroll && onScroll(event);
+		onScroll && onScroll(event.nativeEvent);
 	}
 }

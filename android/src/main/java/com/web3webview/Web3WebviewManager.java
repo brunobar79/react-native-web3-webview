@@ -137,6 +137,7 @@ public class Web3WebviewManager extends ReactWebViewManager {
     protected static final String BLANK_URL = "about:blank";
 
     protected WebViewConfig mWebViewConfig;
+    protected WebSettings mWebviewSettings;
     private static ReactApplicationContext reactNativeContext;
     private static boolean debug;
     private Web3WebviewPackage pkg;
@@ -515,7 +516,10 @@ public class Web3WebviewManager extends ReactWebViewManager {
             return null;
         }
         try {
+            String ua = mWebviewSettings.getUserAgentString();
+
             Request req = new Request.Builder()
+                    .header("User-Agent", ua)
                     .url(urlStr)
                     .build();
             Response response = httpClient.newCall(req).execute();
@@ -575,9 +579,14 @@ public class Web3WebviewManager extends ReactWebViewManager {
         settings.setBuiltInZoomControls(true);
         settings.setDisplayZoomControls(false);
         settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setAppCacheEnabled (true);
+        settings.setLoadWithOverviewMode(true);
+        settings.setAllowContentAccess(true);
+        settings.setLoadsImagesAutomatically(true);
+        settings.setBlockNetworkImage(false);
+        settings.setBlockNetworkLoads(false);
 
-        settings.setAllowFileAccess(false);
-        settings.setAllowContentAccess(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             settings.setAllowFileAccessFromFileURLs(false);
             setAllowUniversalAccessFromFileURLs(webView, false);
@@ -610,6 +619,8 @@ public class Web3WebviewManager extends ReactWebViewManager {
                 }
             });
         }
+
+        mWebviewSettings = settings;
 
         return webView;
     }

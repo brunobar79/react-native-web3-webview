@@ -1,11 +1,41 @@
 {
-  "name": "react-native-web3-webview",
-  "version": "1.2.1",
-  "description": "A react native webview optimized for a web3 dApp browser application",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "_from": "react-native-web3-webview@^1.2.0",
+  "_id": "react-native-web3-webview@1.2.0",
+  "_inBundle": false,
+  "_integrity": "sha512-lKG6JqssbNTTzcXiou7IVyvJWpDem2EavtUsF+I6CaKvoMztMkOHVcLqngPYOnGg85CrTKrmgEqYeiPhHmbeBg==",
+  "_location": "/react-native-web3-webview",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "react-native-web3-webview@^1.2.0",
+    "name": "react-native-web3-webview",
+    "escapedName": "react-native-web3-webview",
+    "rawSpec": "^1.2.0",
+    "saveSpec": null,
+    "fetchSpec": "^1.2.0"
   },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-native-web3-webview/-/react-native-web3-webview-1.2.0.tgz",
+  "_shasum": "62202fadc25adfcec3ea55469b8e3a30c29674fb",
+  "_spec": "react-native-web3-webview@^1.2.0",
+  "_where": "/Users/bruno/repos/MetaMask",
+  "author": {
+    "name": "Bruno Barbieri",
+    "email": "brunobar79@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/brunobar79/react-native-web3-webview/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "fbjs": "^0.8.3"
+  },
+  "deprecated": false,
+  "description": "A react native webview optimized for a web3 dApp browser application",
+  "homepage": "https://github.com/brunobar79/react-native-web3-webview",
   "keywords": [
     "react",
     "native",
@@ -16,21 +46,42 @@
     "web3",
     "ethereum"
   ],
-  "author": {
-    "name": "Bruno Barbieri",
-    "email": "brunobar79@gmail.com"
-  },
-  "homepage": "https://github.com/brunobar79/react-native-web3-webview",
-  "bugs": {
-    "url": "https://github.com/brunobar79/react-native-web3-webview/issues"
-  },
   "license": "MIT",
-  "dependencies": {
-    "fbjs": "^0.8.3"
-  },
+  "main": "index.js",
+  "name": "react-native-web3-webview",
   "peerDependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-native": "^0.56.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.2.0",
+  "react-native": {
+    "crypto": "react-native-crypto",
+    "http": "@tradle/react-native-http",
+    "https": "https-browserify",
+    "os": "react-native-os",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify",
+    "vm": "vm-browserify"
+  },
+  "browser": {
+    "crypto": "react-native-crypto",
+    "http": "@tradle/react-native-http",
+    "https": "https-browserify",
+    "os": "react-native-os",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify",
+    "vm": "vm-browserify"
   }
 }
