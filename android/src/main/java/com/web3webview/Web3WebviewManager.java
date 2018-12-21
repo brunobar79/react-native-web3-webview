@@ -419,23 +419,20 @@ public class Web3WebviewManager extends ReactWebViewManager {
 
         public void linkBridge() {
             if (messagingEnabled) {
+                String script = "(function() {" +
+                        "var postMessage = window.postMessage;"+
+                        "window.postMessage = function(data, target, transfer) {"+
+                        "if (postMessage) {"+
+                        "postMessage.apply(window, arguments);"+
+                        "}"+
+                        BRIDGE_NAME + ".postMessage(JSON.stringify(data))"+
+                        "};"+
+                        "})();";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    evaluateJavascript("(" +
-                                "console.log('postMessage has been polyfilled')," +
-                                "window.originalPostMessage = window.postMessage," +
-                                "window.postMessage = function(data) {" +
-                                    BRIDGE_NAME + ".postMessage(JSON.stringify(data));" +
-                                "}" +
-                            ")", null);
-
+                    evaluateJavascript(script
+                            , null);
                 }else{
-                    loadUrl("javascript:(" +
-                            "console.log('postMessage has been polyfilled')," +
-                            "window.originalPostMessage = window.postMessage," +
-                            "window.postMessage = function(data) {" +
-                            BRIDGE_NAME + ".postMessage(JSON.stringify(data));" +
-                            "}" +
-                            ")");
+                    loadUrl("javascript:"+script);
                 }
 
             }
