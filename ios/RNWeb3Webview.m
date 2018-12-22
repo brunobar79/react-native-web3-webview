@@ -75,14 +75,14 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
     _scrollEventThrottle = 0.0;
-     
-      
-      
+
+
+
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.processPool = processPool;
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:@"reactNative"];
-      
+
     config.userContentController = userController;
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
@@ -156,8 +156,8 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   if (_messagingEnabled) {
     NSString *source=@"window.postMessageToNative = function (data) { window.webkit.messageHandlers.reactNative.postMessage(data); }";
     WKUserScript *script = [[WKUserScript alloc] initWithSource:source
-                                                      injectionTime:WKUserScriptInjectionTimeAtDocumentStart
-                                                   forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
+                           injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                               forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
     [_webView.configuration.userContentController addUserScript:script];
   }
 }
@@ -464,25 +464,25 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  
+
     [self updateClippedSubviews];
-    
+
     if (!scrollView.scrollEnabled) {
         scrollView.bounds = _webView.bounds;
         return;
     }
-    
+
     NSTimeInterval now = CACurrentMediaTime();
-    
+
     if (_allowNextScrollNoMatterWhat ||
         (_scrollEventThrottle > 0 && _scrollEventThrottle < (now - _lastScrollDispatchTime))) {
-        
+
         _onScroll([self getEventInfo:scrollView]);
         // Update dispatch time
         _lastScrollDispatchTime = now;
         _allowNextScrollNoMatterWhat = NO;
     }
-  
+
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -497,7 +497,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
 {
-    
+
     // Fire the being deceleration event
     _onMomentumScrollBegin([self getEventInfo:scrollView]);
 }
@@ -505,7 +505,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     [self scrollViewDidScroll:scrollView];
-    
+
     // Fire the end deceleration event
     _onMomentumScrollEnd([self getEventInfo:scrollView]);
 }
@@ -513,7 +513,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     [self scrollViewDidScroll:scrollView];
-    
+
     // Fire the end deceleration event
     _onMomentumScrollEnd([self getEventInfo:scrollView]);
 }

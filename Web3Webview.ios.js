@@ -444,11 +444,11 @@ class Web3Webview extends React.Component {
 				injectedJavaScriptForMainFrameOnly={
 					this.props.injectedJavaScriptForMainFrameOnly
 				}
-				injectJavaScript={this.props.injectJavaScript}
-				injectedJavaScript={
-					this.props.injectedJavaScript ||
+				injectJavaScript={
+					this.props.injectJavaScript ||
 					this.props.injectedOnStartLoadingJavaScript
 				}
+				injectedJavaScript={ this.props.injectedJavaScript }
 				bounces={this.props.bounces}
 				scrollEnabled={this.props.scrollEnabled}
 				contentInset={this.props.contentInset}

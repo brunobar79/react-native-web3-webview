@@ -419,11 +419,11 @@ public class Web3WebviewManager extends ReactWebViewManager {
 
         public void linkBridge() {
             if (messagingEnabled) {
-                String script = "(function() {" +
-                         "window.postMessageToNative = function(data) {"+
+                String script = "(" +
+                        "window.postMessageToNative = function(data) {"+
                             BRIDGE_NAME + ".postMessage(JSON.stringify(data))"+
                         "};"+
-                        "})();";
+                ")";
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     evaluateJavascript(script
                             , null);
