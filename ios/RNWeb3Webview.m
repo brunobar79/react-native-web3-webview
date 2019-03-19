@@ -58,6 +58,7 @@
   NSString *_injectedJavaScript;
   BOOL _allowNextScrollNoMatterWhat;
   NSTimeInterval _lastScrollDispatchTime;
+  int _BOTTOMBAR_HEIGHT;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -75,8 +76,9 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
     _scrollEventThrottle = 0.0;
-
-
+      
+    _BOTTOMBAR_HEIGHT = (int)[[UIScreen mainScreen] nativeBounds].size.height > 1334 ? 74 : 48;
+      
 
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.processPool = processPool;
@@ -89,6 +91,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _webView.UIDelegate = self;
     _webView.navigationDelegate = self;
     _webView.scrollView.delegate = self;
+
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
     // `contentInsetAdjustmentBehavior` is only available since iOS 11.
@@ -622,7 +625,15 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 {
   // we only need the final 'finishLoad' call so only fire the event when we're actually done loading.
   if (_onLoadingFinish && !webView.loading && ![webView.URL.absoluteString isEqualToString:@"about:blank"]) {
-    _onLoadingFinish([self baseEvent]);
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+          if(webView.scrollView.contentSize.height <= webView.scrollView.frame.size.height){
+              webView.scrollView.contentInset = UIEdgeInsetsMake(0, 0, _BOTTOMBAR_HEIGHT, 0);
+          } else {
+              webView.scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
+          }
+      });
+    
+      _onLoadingFinish([self baseEvent]);
   }
 }
 
