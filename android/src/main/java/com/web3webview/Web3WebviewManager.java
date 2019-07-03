@@ -15,7 +15,8 @@ import android.graphics.Bitmap;
 import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -76,8 +77,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -141,13 +140,13 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     private static ReactApplicationContext reactNativeContext;
     private static boolean debug;
     private Web3WebviewPackage pkg;
-    protected @Nullable WebView.PictureListener mPictureListener;
+    protected @NonNull WebView.PictureListener mPictureListener;
 
     protected class Web3WebviewClient extends WebViewClient {
 
         protected boolean mLastLoadFailed = false;
-        protected @Nullable ReadableArray mUrlPrefixesForDefaultIntent;
-        protected @Nullable List<Pattern> mOriginWhitelist;
+        protected @NonNull ReadableArray mUrlPrefixesForDefaultIntent;
+        protected @NonNull List<Pattern> mOriginWhitelist;
 
 
         @Override
@@ -306,10 +305,10 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
      * to call {@link WebView#destroy} on activity destroy event and also to clear the client
      */
     protected static class Web3Webview extends WebView implements LifecycleEventListener {
-        protected @Nullable String injectedJS;
-        protected @Nullable String injectedOnStartLoadingJS;
+        protected @NonNull String injectedJS;
+        protected @NonNull String injectedOnStartLoadingJS;
         protected boolean messagingEnabled = false;
-        protected @Nullable Web3WebviewClient mWeb3WebviewClient;
+        protected @NonNull Web3WebviewClient mWeb3WebviewClient;
         private final OnScrollDispatchHelper mOnScrollDispatchHelper = new OnScrollDispatchHelper();
 
         protected class Web3WebviewBridge {
@@ -358,15 +357,15 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
             mWeb3WebviewClient = (Web3WebviewClient)client;
         }
 
-        public @Nullable Web3WebviewClient getWeb3WebviewClient() {
+        public @NonNull Web3WebviewClient getWeb3WebviewClient() {
             return mWeb3WebviewClient;
         }
 
-        public void setInjectedJavaScript(@Nullable String js) {
+        public void setInjectedJavaScript(@NonNull String js) {
             injectedJS = js;
         }
 
-        public void setInjectedOnStartLoadingJavaScript(@Nullable String js) {
+        public void setInjectedOnStartLoadingJavaScript(@NonNull String js) {
             injectedOnStartLoadingJS = js;
         }
 
@@ -583,7 +582,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
                         LayoutParams.MATCH_PARENT));
 
         setGeolocationEnabled(webView, false);
-        if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
@@ -629,7 +628,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @ReactProp(name = "userAgent")
-    public void setUserAgent(WebView view, @Nullable String userAgent) {
+    public void setUserAgent(WebView view, @NonNull String userAgent) {
         if (userAgent != null) {
             view.getSettings().setUserAgentString(userAgent);
         }
@@ -653,12 +652,12 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @ReactProp(name = "injectedJavaScript")
-    public void setInjectedJavaScript(WebView view, @Nullable String injectedJavaScript) {
+    public void setInjectedJavaScript(WebView view, @NonNull String injectedJavaScript) {
         ((Web3Webview) view).setInjectedJavaScript(injectedJavaScript);
     }
 
     @ReactProp(name = "injectedOnStartLoadingJavaScript")
-    public void setInjectedOnStartLoadingJavaScript(WebView view, @Nullable String injectedJavaScript) {
+    public void setInjectedOnStartLoadingJavaScript(WebView view, @NonNull String injectedJavaScript) {
         ((Web3Webview) view).setInjectedOnStartLoadingJavaScript(injectedJavaScript);
     }
 
@@ -668,7 +667,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @ReactProp(name = "source")
-    public void setSource(WebView view, @Nullable ReadableMap source) {
+    public void setSource(WebView view, @NonNull ReadableMap source) {
         if (source != null) {
             if (source.hasKey("html")) {
                 String html = source.getString("html");
@@ -734,7 +733,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @ReactProp(name = "mixedContentMode")
-    public void setMixedContentMode(WebView view, @Nullable String mixedContentMode) {
+    public void setMixedContentMode(WebView view, @NonNull String mixedContentMode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (mixedContentMode == null || "never".equals(mixedContentMode)) {
                 view.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
@@ -749,7 +748,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     @ReactProp(name = "urlPrefixesForDefaultIntent")
     public void setUrlPrefixesForDefaultIntent(
             WebView view,
-            @Nullable ReadableArray urlPrefixesForDefaultIntent) {
+            @NonNull ReadableArray urlPrefixesForDefaultIntent) {
         Web3WebviewClient client = ((Web3Webview) view).getWeb3WebviewClient();
         if (client != null && urlPrefixesForDefaultIntent != null) {
             client.setUrlPrefixesForDefaultIntent(urlPrefixesForDefaultIntent);
@@ -759,14 +758,14 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     @ReactProp(name = "geolocationEnabled")
     public void setGeolocationEnabled(
             WebView view,
-            @Nullable Boolean isGeolocationEnabled) {
+            @NonNull Boolean isGeolocationEnabled) {
         view.getSettings().setGeolocationEnabled(isGeolocationEnabled != null && isGeolocationEnabled);
     }
 
     @ReactProp(name = "originWhitelist")
     public void setOriginWhitelist(
             WebView view,
-            @Nullable ReadableArray originWhitelist) {
+            @NonNull ReadableArray originWhitelist) {
         Web3WebviewClient client = ((Web3Webview) view).getWeb3WebviewClient();
         if (client != null && originWhitelist != null) {
             List<Pattern> whiteList = new LinkedList<>();
@@ -783,7 +782,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
-    public @Nullable Map<String, Integer> getCommandsMap() {
+    public @NonNull Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
                 "goBack", COMMAND_GO_BACK,
                 "goForward", COMMAND_GO_FORWARD,
@@ -795,7 +794,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
-    public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
+    public void receiveCommand(WebView root, int commandId, @NonNull ReadableArray args) {
         switch (commandId) {
             case COMMAND_GO_BACK:
                 root.goBack();
@@ -869,7 +868,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
-    public @Nullable Map getExportedCustomBubblingEventTypeConstants() {
+    public @NonNull Map getExportedCustomBubblingEventTypeConstants() {
         return MapBuilder.builder()
                 .put("progress",
                         MapBuilder.of(
