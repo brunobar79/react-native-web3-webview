@@ -582,7 +582,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
                         LayoutParams.MATCH_PARENT));
 
         setGeolocationEnabled(webView, false);
-        if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
