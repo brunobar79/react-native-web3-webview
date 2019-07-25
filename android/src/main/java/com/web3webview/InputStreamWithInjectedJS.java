@@ -65,8 +65,6 @@ public class InputStreamWithInjectedJS extends InputStream {
             return pageIS.read();
         }
 
-        // NOW I NEED TO FIX THIS SHIT
-
         if (!scriptWasInjected && headWasFound) {
             int nextByte = scriptIS.read();
             if (nextByte == -1) {
