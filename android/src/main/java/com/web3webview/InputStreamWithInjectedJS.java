@@ -90,7 +90,7 @@ public class InputStreamWithInjectedJS extends InputStream {
                  }
             } else {
                 boolean isLetterD = (nextByte == 68 || nextByte == 100);
-                if (isLetterD  && bufferLength >= 6) {
+                if (isLetterD  && bufferLength >= 5) {
                     String stringToMatch = contentBuffer.substring(bufferLength - 5).toLowerCase();
                     if (stringToMatch.contains(headString)) {
                         openingHeadFound = true;
