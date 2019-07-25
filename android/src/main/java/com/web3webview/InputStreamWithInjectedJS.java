@@ -25,6 +25,7 @@ public class InputStreamWithInjectedJS extends InputStream {
     private boolean hasJS = false;
     private boolean headWasFound = false;
     private boolean scriptWasInjected = false;
+    private boolean openingHeadFound = false;
     private StringBuffer contentBuffer = new StringBuffer();
     private static Charset getCharset(String charsetName) {
         Charset cs = UTF_8;
@@ -63,6 +64,7 @@ public class InputStreamWithInjectedJS extends InputStream {
         if (scriptWasInjected || !hasJS) {
             return pageIS.read();
         }
+
         if (!scriptWasInjected && headWasFound) {
             int nextByte = scriptIS.read();
             if (nextByte == -1) {
@@ -75,12 +77,22 @@ public class InputStreamWithInjectedJS extends InputStream {
         }
         if (!headWasFound) {
             int nextByte = pageIS.read();
-            contentBuffer.append((char) nextByte);
+            char nextByteStr =  (char) nextByte;
+            contentBuffer.append(nextByteStr);
             int bufferLength = contentBuffer.length();
-            if (nextByte == 62 && bufferLength >= 6) {
-                if (contentBuffer.substring(bufferLength - 6).equals("<head>")) {
+            String headString = "<head";
+            if(openingHeadFound){
+                 if(nextByte == 62){
                     this.scriptIS = getScript(this.charset);
                     headWasFound = true;
+                 }
+            } else {
+                boolean isLetterD = (nextByte == 68 || nextByte == 100);
+                if (isLetterD  && bufferLength >= 5) {
+                    String stringToMatch = contentBuffer.substring(bufferLength - 5).toLowerCase();
+                    if (stringToMatch.contains(headString)) {
+                        openingHeadFound = true;
+                    }
                 }
             }
             return nextByte;
