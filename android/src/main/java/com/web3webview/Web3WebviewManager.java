@@ -26,6 +26,7 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ServiceWorkerClient;
 import android.webkit.ServiceWorkerController;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -530,7 +531,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
 
     @Override
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    protected WebView createViewInstance(ThemedReactContext reactContext) {
+    protected WebView createViewInstance(final ThemedReactContext reactContext) {
         final Web3Webview webView = createWeb3WebviewInstance(reactContext);
 
 
@@ -555,6 +556,29 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
                 callback.invoke(origin, true, false);
             }
+
+            protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
+                getModule(reactContext).startPhotoPickerIntent(filePathCallback, acceptType);
+            }
+
+            protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
+                getModule(reactContext).startPhotoPickerIntent(filePathCallback, "");
+            }
+
+            protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
+                getModule(reactContext).startPhotoPickerIntent(filePathCallback, acceptType);
+            }
+
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                String[] acceptTypes = fileChooserParams.getAcceptTypes();
+                boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+                Intent intent = fileChooserParams.createIntent();
+                return getModule(reactContext).startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+            }
+
+
         });
         reactContext.addLifecycleEventListener(webView);
         mWebViewConfig.configWebView(webView);
@@ -841,6 +865,10 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
         Web3Webview w = (Web3Webview) webView;
         ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener(w);
         w.cleanupCallbacksAndDestroy();
+    }
+
+    public static Web3WebviewModule getModule(ReactContext reactContext) {
+        return reactContext.getNativeModule(Web3WebviewModule.class);
     }
 
     protected WebView.PictureListener getPictureListener() {

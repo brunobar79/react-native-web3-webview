@@ -353,6 +353,12 @@ class Web3Webview extends React.Component {
 		openNewWindowInWebView: true
 	};
 
+	static isFileUploadSupported = async () => {
+		// no native implementation for iOS, depends only on permissions
+		return true;
+	}
+
+
 	UNSAFE_componentWillMount() {
 		if (this.props.startInLoadingState) {
 			this.setState({ viewState: WebViewState.LOADING });

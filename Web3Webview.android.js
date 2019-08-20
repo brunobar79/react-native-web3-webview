@@ -14,7 +14,8 @@ import {
 	StyleSheet,
 	UIManager,
 	View,
-	findNodeHandle
+	findNodeHandle,
+	NativeModules
 } from "react-native";
 
 const styles = StyleSheet.create({
@@ -259,6 +260,11 @@ export default class WebView extends React.Component {
 		showDefaultLoader: false,
 		openNewWindowInWebView: true
 	};
+
+	static isFileUploadSupported = async () => {
+		// native implementation should return "true" only for Android 5+
+		return NativeModules.Web3Webview.isFileUploadSupported();
+	}
 
 	state = {
 		viewState: WebViewState.IDLE,

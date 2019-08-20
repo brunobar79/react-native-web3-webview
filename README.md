@@ -6,8 +6,8 @@
 
 A cross platform react native webview with some improvements that allow a javascript injection, which is specifically used by web3 mobile dapp browsers.
 
-The iOS version is based on [react-native-wkwebview-reborn](https://github.com/CRAlpha/react-native-wkwebview) and the Android version is based on [react-native-webview-bridge](https://github.com/alinz/react-native-webview-bridge)
-
+The iOS version is based on [react-native-wkwebview-reborn](https://github.com/CRAlpha/react-native-wkwebview) and the Android version is based on [react-native-webview-bridge](https://github.com/alinz/react-native-webview-bridge) and [react-native-webview](https://github.com/react-native-community/react-native-webview/)
+ 
 ## Getting started
 
 `$ npm install react-native-web3-webview --save`
