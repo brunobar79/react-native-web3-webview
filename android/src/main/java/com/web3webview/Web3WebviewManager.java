@@ -188,11 +188,23 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
                 return false;
             }
 
+
+			String url = request.getUrl().toString();
+			// Disabling the URL schemes that cause problems
+			String[] blacklistedUrls = { "intent:#Intent;action=com.ledger.android.u2f.bridge.AUTHENTICATE" };
+			for(int i=0; i< blacklistedUrls.length; i++){
+				String badUrl = blacklistedUrls[i];
+				if(url.contains(badUrl)){
+					return true;
+				}
+			}
+
             // This works only for API 24+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (request.isForMainFrame() && request.isRedirect()) {
-                    view.loadUrl(request.getUrl().toString());
-                    return true;
+
+					view.loadUrl(url);
+					return true;
                 }
             }
 

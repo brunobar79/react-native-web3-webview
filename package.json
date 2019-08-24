@@ -1,6 +1,6 @@
 {
   "name": "react-native-web3-webview",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "A react native webview optimized for a web3 dApp browser application",
   "main": "index.js",
   "scripts": {
