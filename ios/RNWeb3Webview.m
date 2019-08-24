@@ -537,67 +537,61 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)webView:(__unused WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
-  UIApplication *app = [UIApplication sharedApplication];
-  NSURLRequest *request = navigationAction.request;
-  NSURL* url = request.URL;
-  NSString* scheme = url.scheme;
-
-  BOOL isJSNavigation = [scheme isEqualToString:RCTJSNavigationScheme];
-
-  // handle mailto and tel schemes
-  if ([scheme isEqualToString:@"mailto"] || [scheme isEqualToString:@"tel"]) {
-    if ([app canOpenURL:url]) {
-      [app openURL:url];
-      decisionHandler(WKNavigationActionPolicyCancel);
-      return;
+    static NSDictionary<NSNumber *, NSString *> *navigationTypes;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        navigationTypes = @{
+                            @(WKNavigationTypeLinkActivated): @"click",
+                            @(WKNavigationTypeFormSubmitted): @"formsubmit",
+                            @(WKNavigationTypeBackForward): @"backforward",
+                            @(WKNavigationTypeReload): @"reload",
+                            @(WKNavigationTypeFormResubmitted): @"formresubmit",
+                            @(WKNavigationTypeOther): @"other",
+                            };
+    });
+    
+    WKNavigationType navigationType = navigationAction.navigationType;
+    NSURLRequest *request = navigationAction.request;
+    
+    if (_onShouldStartLoadWithRequest) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        [event addEntriesFromDictionary: @{
+                                           @"url": (request.URL).absoluteString,
+                                           @"mainDocumentURL": (request.mainDocumentURL).absoluteString,
+                                           @"navigationType": navigationTypes[@(navigationType)]
+                                           }];
+        if (![self.delegate webView:self
+          shouldStartLoadForRequest:event
+                       withCallback:_onShouldStartLoadWithRequest]) {
+            decisionHandler(WKNavigationActionPolicyCancel);
+            return;
+        }
     }
-  }
-
-  // skip this for the JS Navigation handler
-  if (!isJSNavigation && _onShouldStartLoadWithRequest) {
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary: @{
-                                       @"url": (request.URL).absoluteString,
-                                       @"navigationType": @(navigationAction.navigationType)
-                                       }];
-    if (![self.delegate webView:self
-      shouldStartLoadForRequest:event
-                   withCallback:_onShouldStartLoadWithRequest]) {
-      return decisionHandler(WKNavigationActionPolicyCancel);
+    
+    if (_onLoadingStart) {
+        // We have this check to filter out iframe requests and whatnot
+        BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
+        if (isTopFrame) {
+            NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+            [event addEntriesFromDictionary: @{
+                                               @"url": (request.URL).absoluteString,
+                                               @"navigationType": navigationTypes[@(navigationType)]
+                                               }];
+            _onLoadingStart(event);
+        }
     }
-  }
-
-  if (_onLoadingStart) {
-    // We have this check to filter out iframe requests and whatnot
-    BOOL isTopFrame = [url isEqual:request.mainDocumentURL];
-    if (isTopFrame) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      [event addEntriesFromDictionary: @{
-                                         @"url": url.absoluteString,
-                                         @"navigationType": @(navigationAction.navigationType)
-                                         }];
-      _onLoadingStart(event);
+    
+    // Allow all navigation by default
+    
+    
+    NSString* scheme = request.URL.scheme;
+    NSArray *blacklistedSchemes = @[@"u2f"];
+    if ([blacklistedSchemes containsObject:scheme]) {
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else {
+        decisionHandler(WKNavigationActionPolicyAllow);
     }
-  }
-
-  if (isJSNavigation) {
-
-  	decisionHandler(WKNavigationActionPolicyCancel);
-
-  } else if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
-
-  	decisionHandler(WKNavigationActionPolicyAllow);
-
-  } else {
-
-  	if (![scheme isEqualToString:@"about"]) {
-    	[[UIApplication sharedApplication] openURL:url];
-    }
-
-    decisionHandler(WKNavigationActionPolicyAllow);
-
-  }
-
 }
 
 - (void)webView:(__unused WKWebView *)webView didFailProvisionalNavigation:(__unused WKNavigation *)navigation withError:(NSError *)error
