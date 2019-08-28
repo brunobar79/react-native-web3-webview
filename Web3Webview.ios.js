@@ -567,8 +567,10 @@ class Web3Webview extends React.Component {
 	 * ```
 	 */
 	postMessage = data => {
+		const webViewHandle = this.getWebViewHandle()
+		if (!webViewHandle) return
 		UIManager.dispatchViewManagerCommand(
-			this.getWebViewHandle(),
+			webViewHandle,
 			UIManager.RNWeb3Webview.Commands.postMessage,
 			[String(data)]
 		);

@@ -413,8 +413,10 @@ export default class WebView extends React.Component {
 	};
 
 	postMessage = data => {
+		const webViewHandle = this.getWebViewHandle()
+		if (!webViewHandle) return
 		UIManager.dispatchViewManagerCommand(
-			this.getWebViewHandle(),
+			webViewHandle,
 			UIManager.Web3Webview.Commands.postMessage,
 			[String(data)]
 		);
