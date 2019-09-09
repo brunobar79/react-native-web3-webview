@@ -526,7 +526,7 @@ public class Web3WebviewManager extends SimpleViewManager<WebView> {
             InputStream is = response.body().byteStream();
             MediaType contentType = response.body().contentType();
             Charset charset = contentType != null ? contentType.charset(UTF_8) : UTF_8;
-            if (response.code() == HttpURLConnection.HTTP_OK) {
+            if (response.code() < HttpURLConnection.HTTP_MULT_CHOICE || response.code() >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 is = new InputStreamWithInjectedJS(is, webView.injectedOnStartLoadingJS, charset, webView.getContext());
             }
             return new WebResourceResponse("text/html", charset.name(), is);
